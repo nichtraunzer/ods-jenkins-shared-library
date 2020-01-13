@@ -205,7 +205,7 @@ class OdsPipeline implements Serializable {
             --request POST \\
             --header \"Content-Type: application/json\" \\
             --data '{\"state\":\"${state}\",\"key\":\"${buildName}\",\"name\":\"${buildName}\",\"url\":\"${context.buildUrl}\"}' \\
-            https://${context.bitbucketHost}/rest/build-status/1.0/commits/${context.gitCommit}
+            http://${context.bitbucketHost}/rest/build-status/1.0/commits/${context.gitCommit}
           """
         }
         return
