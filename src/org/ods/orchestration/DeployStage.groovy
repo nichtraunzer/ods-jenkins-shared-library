@@ -4,10 +4,15 @@ import org.ods.services.ServiceRegistry
 import org.ods.services.OpenShiftService
 import org.ods.orchestration.scheduler.LeVADocumentScheduler
 import org.ods.orchestration.util.MROPipelineUtil
+import org.ods.orchestration.util.PipelineUtil
 import org.ods.orchestration.util.Project
+import org.ods.services.JenkinsService
 import org.ods.util.PipelineSteps
 import org.ods.util.Logger
 import org.ods.util.ILogger
+
+import groovy.json.JsonOutput
+
 
 class DeployStage extends Stage {
 
@@ -48,6 +53,25 @@ class DeployStage extends Stage {
             // In case we run the phase on an agent node, we need to make sure that
             // the levaDocScheduler.run is executed on the master node, as it does
             // not work on agent nodes yet.
+
+            if (repo.type?.toLowerCase() == MROPipelineUtil.PipelineConfig.REPO_TYPE_ODS_INFRA) {
+                if (repo.data == null) repo.data = [:] 
+                if (repo.data.tests == null) repo.data.tests = [:] 
+                repo.data.tests << [installation: getTestResults(steps, repo, Project.TestType.INSTALLATION)]
+
+                if (repo.data.logs == null) repo.data.logs = [:] 
+                repo.data.logs << [created: getLogResults(steps, repo, Project.LogReportType.CHANGES)]
+
+                repo.data.logs << [target: getLogResults(steps, repo, Project.LogReportType.TARGET)]
+
+                repo.data.logs << [state: getLogResults(steps, repo, Project.LogReportType.STATE)]
+
+                logger.info("XXX Repo Data '${JsonOutput.toJson(repo.data.logs)}'")
+                repo.data.logs.state.content = JsonOutput.prettyPrint(repo.data.logs.state.content[0])
+                logger.info("XXX Repo State '${repo.data.logs.state.content}'")
+                
+            }
+
             if (agentPodCondition) {
                 script.node {
                     script.sh "cp -r ${standardWorkspace}/docs ${script.env.WORKSPACE}/docs"

@@ -213,6 +213,12 @@ class Project {
         static final String UNIT = 'Unit'
     }
 
+    class LogReportType {
+        static final String CHANGES = 'changes'
+        static final String TARGET = 'target'
+        static final String STATE = 'state'
+    }
+
     class GampTopic {
         static final String AVAILABILITY_REQUIREMENT = 'Availability Requirement'
         static final String CONSTRAINT = 'Constraint'

@@ -123,6 +123,48 @@ class Stage {
         ]
     }
 
+    Map getLogResults(def steps, Map repo, String logType = 'changes') {
+        def jenkins = ServiceRegistry.instance.get(JenkinsService)
+        ILogger logger = ServiceRegistry.instance.get(Logger)
+
+        def logsStashName = "${logType}-${repo.id}-${steps.env.BUILD_ID}"
+        def logsPath = "${PipelineUtil.LOGS_BASE_DIR}/${repo.id}"
+        def logsUnstashPath = "${steps.env.WORKSPACE}/${logsPath}/${logType}"
+
+        def hasStashedLogs = jenkins.unstashFilesIntoPath(logsStashName, logsUnstashPath, 'Infrastructure Logs')
+ 
+        logger.info("XXX logInfo '${logsStashName} / ${logsPath} / ${logsUnstashPath}'")
+
+        if (!hasStashedLogs) {
+            throw new RuntimeException("Error: unable to unstash Infrastructure Logs for repo '${repo.id}' from stash '${logsStashName}'.")
+        }
+
+        def dir = new File(logsUnstashPath)
+        def logFiles = []
+        def logs
+        def filelength = 0
+        
+        try {
+            dir.traverse(nameFilter: ~/.*\.log$/, type: groovy.io.FileType.FILES) { file ->
+                logFiles << file
+                filelength += file.text.length()
+            }
+        } catch (FileNotFoundException e) {}
+
+        // consider content to be an array of lines (.readLines())
+        logs = logFiles.collect{ file -> 
+            file.text
+        }
+
+        logger.info("XXX which logs do we have '${logs}'")
+
+        if (filelength > 0) {
+            return [content: logs]
+        } else {
+            return [:]
+        }
+    }
+
     protected def runOnAgentPod(boolean condition, Closure block) {
         ILogger logger = ServiceRegistry.instance.get(Logger)
         if (condition) {
