@@ -58,7 +58,7 @@ class BuildStage extends Stage {
                     repo,
                     data
                 )
-            } 
+            }
         }
 
         Closure generateDocuments = {

@@ -1,5 +1,7 @@
 package org.ods.orchestration
 
+import com.cloudbees.groovy.cps.NonCPS
+
 import org.ods.services.ServiceRegistry
 import org.ods.orchestration.util.Project
 import org.ods.orchestration.util.PipelineUtil
@@ -100,12 +102,14 @@ class Stage {
         if (type != 'unit') {
             testReportsStashName = "${type}-${testReportsStashName}"
         }
+
         def testReportsUnstashPath = "${steps.env.WORKSPACE}/${testReportsPath}"
         def hasStashedTestReports = jenkins.unstashFilesIntoPath(
             testReportsStashName,
             testReportsUnstashPath,
             'JUnit XML Report'
         )
+
         if (!hasStashedTestReports) {
             throw new RuntimeException(
                 "Error: unable to unstash JUnit XML reports, type '${type}' for repo '${repo.id}' " +
@@ -123,46 +127,39 @@ class Stage {
         ]
     }
 
-    Map getLogResults(def steps, Map repo, String logType = 'changes') {
+    Map getLogReports(def steps, Map repo, String type) {
         def jenkins = ServiceRegistry.instance.get(JenkinsService)
         ILogger logger = ServiceRegistry.instance.get(Logger)
 
-        def logsStashName = "${logType}-${repo.id}-${steps.env.BUILD_ID}"
+        logger.debug("Collecting Logs Reports ('${type}') for ${repo.id}")
+        def logsStashName = "${type}-${repo.id}-${steps.env.BUILD_ID}"
         def logsPath = "${PipelineUtil.LOGS_BASE_DIR}/${repo.id}"
-        def logsUnstashPath = "${steps.env.WORKSPACE}/${logsPath}/${logType}"
+        def logsUnstashPath = "${steps.env.WORKSPACE}/${logsPath}/${type}"
 
-        def hasStashedLogs = jenkins.unstashFilesIntoPath(logsStashName, logsUnstashPath, 'Infrastructure Logs')
- 
-        logger.info("XXX logInfo '${logsStashName} / ${logsPath} / ${logsUnstashPath}'")
-
+        def hasStashedLogs = jenkins.unstashFilesIntoPath(logsStashName, logsUnstashPath, 'Logs')
         if (!hasStashedLogs) {
-            throw new RuntimeException("Error: unable to unstash Infrastructure Logs for repo '${repo.id}' from stash '${logsStashName}'.")
+            throw new RuntimeException("Error: unable to unstash Log reports, type '${type}' for repo '${repo.id}' from stash '${logsStashName}'.")
         }
 
-        def dir = new File(logsUnstashPath)
-        def logFiles = []
-        def logs
-        def filelength = 0
-        
+        def logFiles = loadLogFilesFromPath(logsUnstashPath)
+        def logs = logFiles.collect { file ->
+            file ? file.text : ""
+        }
+
+        return [content: logs]
+    }
+
+    @NonCPS
+    protected List<File> loadLogFilesFromPath(String path) {
+        def result = []
+
         try {
-            dir.traverse(nameFilter: ~/.*\.log$/, type: groovy.io.FileType.FILES) { file ->
-                logFiles << file
-                filelength += file.text.length()
+            new File(path).traverse(nameFilter: ~/.*\.log$/, type: groovy.io.FileType.FILES) { file ->
+                result << file
             }
         } catch (FileNotFoundException e) {}
 
-        // consider content to be an array of lines (.readLines())
-        logs = logFiles.collect{ file -> 
-            file.text
-        }
-
-        logger.info("XXX which logs do we have '${logs}'")
-
-        if (filelength > 0) {
-            return [content: logs]
-        } else {
-            return [:]
-        }
+        return result
     }
 
     protected def runOnAgentPod(boolean condition, Closure block) {

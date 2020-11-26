@@ -57,7 +57,6 @@ abstract class DocGenUseCase {
         artifacts << files.collectEntries { path, contents ->
             [ path, contents ]
         }
-        this.steps.echo "XXX createDocument - DocType / TName ${documentType} / ${templateName} "
 
         def doCreateArtifact = shouldCreateArtifact(documentType, repo)
 
@@ -67,13 +66,12 @@ abstract class DocGenUseCase {
             doCreateArtifact
         )
 
-        // dtr / tir for single repo
+        // Concerns DTR/TIR for a single repo
         if (!doCreateArtifact) {
             this.util.createAndStashArtifact(pdfName, document)
             if (repo) {
                 repo.data.documents[documentType] = pdfName
             }
-            this.steps.echo "XXX createDocument - Assign pdfName ${pdfName}"
         }
 
         // Store the archive as an artifact in Nexus
@@ -95,25 +93,16 @@ abstract class DocGenUseCase {
     }
 
     @SuppressWarnings(['JavaIoPackageAccess'])
-    String createOverallDocument(String templateName, String documentType, Map metadata,Closure visitor = null, String watermarkText = null) {
+    String createOverallDocument(String templateName, String documentType, Map metadata, Closure visitor = null, String watermarkText = null) {
         def documents = []
         def sections = []
 
         this.project.repositories.each { repo ->
-
-            this.steps.echo "XXX createOverallDocument - Repo.data       ${repo.data} "
-            this.steps.echo "XXX createOverallDocument - Repo.documents  ${repo.data.documents} "
-            this.steps.echo "XXX createOverallDocument - DocType         ${documentType} "
-            this.steps.echo "XXX createOverallDocument - Docname         ${repo.data.documents[documentType]} "
-           
             def documentName = repo.data.documents[documentType]
-            
             if (documentName) {
                 def path = "${this.steps.env.WORKSPACE}/reports/${repo.id}"
-
-                this.steps.echo "XXX createOverallDocument Path  ${path} / ${documentName}"
                 jenkins.unstashFilesIntoPath(documentName, path, documentType)
-                // writeFile and bytes does not work :(
+
                 documents << new File("${path}/${documentName}").readBytes()
 
                 sections << [
@@ -209,7 +198,8 @@ abstract class DocGenUseCase {
         if (stash) {
             this.util.createAndStashArtifact(contentFileName, resurrectedDocAsBytes)
         }
-        if (!isArchivalRelevant(documentType)) {
+
+        if (!shouldCreateArtifact(documentType, repo)) {
             repo.data.documents[documentType] = contentFileName
         }
 
@@ -233,9 +223,9 @@ abstract class DocGenUseCase {
 
     abstract String getDocumentTemplatesVersion()
 
+    abstract Map getFiletypeForDocumentType (String documentType)
+
     abstract List<String> getSupportedDocuments()
 
     abstract boolean shouldCreateArtifact (String documentType, Map repo)
-
-    abstract Map getFiletypeForDocumentType (String documentType)
 }

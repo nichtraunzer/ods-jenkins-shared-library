@@ -1122,8 +1122,6 @@ class LeVADocumentUseCase extends DocGenUseCase {
             suffix += "-" + capability.GAMPCategory
         }
 
-        this.steps.echo("XXX Template Suffix '${suffix}'")
-        
         return documentType + suffix
     }
 
@@ -1161,8 +1159,6 @@ class LeVADocumentUseCase extends DocGenUseCase {
         def documentType = DocumentType.TIR as String
 
         def installationTestData = data?.tests?.installation 
-
-        this.steps.echo("XXX createTIR - Installation Test Data '${installationTestData}'")
 
         def sections = this.jiraUseCase.getDocumentChapterData(documentType)
         if (!sections) {
@@ -1217,8 +1213,6 @@ class LeVADocumentUseCase extends DocGenUseCase {
             }
             return document
         }
-
-        this.steps.echo("XXX Create TIR Repo '${repo}'")
 
         return this.createDocument(documentType, repo, data_, [:], modifier, getDocumentTemplateName(documentType, repo), watermarkText)
     }
@@ -1454,7 +1448,6 @@ class LeVADocumentUseCase extends DocGenUseCase {
             DocumentType.TIR as String,
             DocumentType.DTR as String
         ]
-        this.steps.echo "XXX isArchivalRelevant -  ${!(documentType && nonArtifactDocTypes.contains(documentType))} / ${documentType}"
 
         return !(documentType && nonArtifactDocTypes.contains(documentType) && repo) 
     }
