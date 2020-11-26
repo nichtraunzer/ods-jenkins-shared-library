@@ -6,7 +6,7 @@ plugins {
 
 group "org.ods"
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.11
 
 ext {
     nexus_url = project.findProperty('nexus_url') ?: System.getenv('NEXUS_URL') ?: System.getenv('NEXUS_HOST')
@@ -115,7 +115,7 @@ test {
 }
 
 codenarc {
-    toolVersion = '1.5'
+    toolVersion = '2.0.0'
     configFile = file('codenarc.groovy')
     maxPriority1Violations = 0
     maxPriority2Violations = 0
@@ -128,5 +128,5 @@ codenarcTest {
 }
 
 jacoco {
-  toolVersion = "0.8.3"
+  toolVersion = "0.8.6"
 }
