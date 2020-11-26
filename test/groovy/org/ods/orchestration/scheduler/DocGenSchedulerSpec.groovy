@@ -31,12 +31,13 @@ class DocGenSchedulerSpec extends SpecHelper {
         String getDocumentTemplatesVersion() {
             return "0.1"
         }
-        
-        boolean isArchivalRelevant (String documentType) {
-            return true
-        }
+
         Map getFiletypeForDocumentType (String documentType) {
             return [storage: 'zip', content: 'pdf']
+        }
+        
+        boolean shouldCreateArtifact (String documentType, Map repo) {
+            return true
         }
     }
 
