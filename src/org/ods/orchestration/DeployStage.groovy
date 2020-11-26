@@ -51,8 +51,6 @@ class DeployStage extends Stage {
             // In case we run the phase on an agent node, we need to make sure that
             // the levaDocScheduler.run is executed on the master node, as it does
             // not work on agent nodes yet.
-
-            // TODO: is this the right stage?
             if (repo.type?.toLowerCase() == MROPipelineUtil.PipelineConfig.REPO_TYPE_ODS_INFRA) {
                 if (repo.data == null) { repo.data = [:] }
 
