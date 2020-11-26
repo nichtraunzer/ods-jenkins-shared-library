@@ -1158,7 +1158,7 @@ class LeVADocumentUseCase extends DocGenUseCase {
     String createTIR(Map repo, Map data) {
         def documentType = DocumentType.TIR as String
 
-        def installationTestData = data?.tests?.installation 
+        def installationTestData = data?.tests?.installation
 
         def sections = this.jiraUseCase.getDocumentChapterData(documentType)
         if (!sections) {
@@ -1449,7 +1449,7 @@ class LeVADocumentUseCase extends DocGenUseCase {
             DocumentType.DTR as String
         ]
 
-        return !(documentType && nonArtifactDocTypes.contains(documentType) && repo) 
+        return !(documentType && nonArtifactDocTypes.contains(documentType) && repo)
     }
 
     Map getFiletypeForDocumentType (String documentType) {

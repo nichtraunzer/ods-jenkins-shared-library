@@ -54,14 +54,14 @@ class DeployStage extends Stage {
 
             // TODO: is this the right stage?
             if (repo.type?.toLowerCase() == MROPipelineUtil.PipelineConfig.REPO_TYPE_ODS_INFRA) {
-                if (repo.data == null) repo.data = [:]
+                if (repo.data == null) { repo.data = [:] }
 
                 // collect test results
-                if (repo.data.tests == null) repo.data.tests = [:]
+                if (repo.data.tests == null) { repo.data.tests = [:] }
                 repo.data.tests << [installation: getTestResults(steps, repo, Project.TestType.INSTALLATION)]
 
                 // collect log data
-                if (repo.data.logs == null) repo.data.logs = [:] 
+                if (repo.data.logs == null) { repo.data.logs = [:] }
                 repo.data.logs << [created: getLogReports(steps, repo, Project.LogReportType.CHANGES)]
                 repo.data.logs << [target: getLogReports(steps, repo, Project.LogReportType.TARGET)]
                 repo.data.logs << [state: getLogReports(steps, repo, Project.LogReportType.STATE)]

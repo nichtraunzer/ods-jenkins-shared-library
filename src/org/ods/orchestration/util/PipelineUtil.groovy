@@ -19,7 +19,6 @@ class PipelineUtil {
     static final String LOGS_BASE_DIR = 'logs'
     static final String SONARQUBE_BASE_DIR = 'sonarqube'
     static final String XUNIT_DOCUMENTS_BASE_DIR = 'xunit'
-    
 
     protected Project project
     protected IPipelineSteps steps

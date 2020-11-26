@@ -138,7 +138,10 @@ class Stage {
 
         def hasStashedLogs = jenkins.unstashFilesIntoPath(logsStashName, logsUnstashPath, 'Logs')
         if (!hasStashedLogs) {
-            throw new RuntimeException("Error: unable to unstash Log reports, type '${type}' for repo '${repo.id}' from stash '${logsStashName}'.")
+            throw new RuntimeException(
+                "Error: unable to unstash Log reports, type '${type}' for repo '${repo.id}'" +
+                " from stash '${logsStashName}'."
+            )
         }
 
         def logFiles = loadLogFilesFromPath(logsUnstashPath)
@@ -150,6 +153,7 @@ class Stage {
     }
 
     @NonCPS
+    @SuppressWarnings(['EmptyCatchBlock', 'JavaIoPackageAccess'])
     protected List<File> loadLogFilesFromPath(String path) {
         def result = []
 
