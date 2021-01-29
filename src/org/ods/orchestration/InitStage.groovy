@@ -60,6 +60,7 @@ class InitStage extends Stage {
                     buildParams.targetEnvironmentToken
                 )?.toString()
                 if (!baseTag) {
+                    logger.info("XXX TagList ${tagList}")
                     throw new RuntimeException(
                         "Error: unable to find latest tag for version ${buildParams.version}/${buildParams.changeId}."
                     )
