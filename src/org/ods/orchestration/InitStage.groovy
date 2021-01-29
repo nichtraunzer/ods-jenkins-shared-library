@@ -302,6 +302,7 @@ class InitStage extends Stage {
                     'INPROGRESS', "Release Manager for commit: ${project.gitData.commit}")
             }
             def jobMode = project.isPromotionMode ? '(promote)' : '(assemble)'
+            jobMode = project.isWorkInProgress ?: '(WIP)'
 
             logger.debug 'Configure current build description'
             script.currentBuild.description = "Build ${jobMode} #${script.BUILD_NUMBER} - " +
