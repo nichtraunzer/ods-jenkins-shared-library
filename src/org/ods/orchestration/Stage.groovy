@@ -138,6 +138,9 @@ class Stage {
         def logsUnstashPath = "${steps.env.WORKSPACE}/${logsPath}/${type}"
 
         def hasStashedLogs = jenkins.unstashFilesIntoPath(logsStashName, logsUnstashPath, 'Logs')
+
+        logger.debug("XXX StashName ${logsStashName} Logspath  ${logsPath} logsUnstashpath  ${logsUnstashPath}")
+        
         if (!hasStashedLogs) {
             throw new RuntimeException(
                 "Error: unable to unstash Log reports, type '${type}' for repo '${repo.id}'" +
