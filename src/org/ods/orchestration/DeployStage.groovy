@@ -58,7 +58,7 @@ class DeployStage extends Stage {
                 // collect log data
                 if (repo.data.logs == null) { repo.data.logs = [:] }
                 script.node {
-                    script.sh "cp -r ${standardWorkspace}/logs ${script.env.WORKSPACE}/logs" || true
+                    script.sh "cp -r ${standardWorkspace}/logs ${script.env.WORKSPACE}/logs" | true
                 }
 
                 repo.data.logs << [created: getLogReports(steps, repo, Project.LogReportType.CHANGES)]
