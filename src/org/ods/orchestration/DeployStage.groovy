@@ -60,6 +60,7 @@ class DeployStage extends Stage {
                 repo.data.logs << [created: getLogReports(steps, repo, Project.LogReportType.CHANGES)]
                 repo.data.logs << [target: getLogReports(steps, repo, Project.LogReportType.TARGET)]
                 repo.data.logs << [state: getLogReports(steps, repo, Project.LogReportType.STATE)]
+                script.echo ("XXX logs: " +  JsonOutput.prettyPrint(repo.data.logs))
                 repo.data.logs.state.content = JsonOutput.prettyPrint(repo.data.logs.state.content[0])
             }
 
